@@ -1,0 +1,191 @@
+flowchart:-
+
+
+flowchart TD
+%% =========================
+%% ENTRY, AUTH & ROLE ROUTING
+%% =========================
+START["User opens AI Train Induction Web App"] --> LOGIN["Login Page<br/>Fields: username, password, MFA OTP<br/>Actions: Login, Forgot password<br/>Security: role based access and session timeout"]
+LOGIN -->|Submit credentials| AUTH{"Credentials valid?"}
+AUTH -->|No| ERRAUTH["Auth error message shown<br/>User may retry or reset password"]
+AUTH -->|Yes| ROLE["Role Selection or Auto Role Detection<br/>Roles: Supervisor, Maintenance Staff, Branding Manager, Depot Ops, Admin"]
+
+ROLE -->|Supervisor| LAND_SUP["Supervisor default landing: Data Ingestion Dashboard"]
+ROLE -->|Maintenance Staff| LAND_MAINT["Maintenance default landing: Maintenance Tracker"]
+ROLE -->|Branding Manager| LAND_BRAND["Branding default landing: Branding Dashboard"]
+ROLE -->|Depot Ops| LAND_OPS["Depot Ops default landing: Execution Tracking"]
+ROLE -->|Admin| LAND_ADMIN["Admin default landing: Admin and Config"]
+
+%% =========================
+%% DATA INGESTION DASHBOARD
+%% =========================
+subgraph P2["Page 2: Data Ingestion Dashboard"]
+direction TB
+ING["Data Ingestion Dashboard<br/>Purpose: show status of all inputs before planning<br/>Widgets per source with last sync and freshness flags"]
+ING --> SRC_MAX["Maximo job cards tile<br/>Fields: last sync time, open count, closed count, errors<br/>Actions: force sync, view details"]
+ING --> SRC_CERT["Fitness certificates tile<br/>Fields: train id, department RS and Signalling and Telecom, expiry date, status<br/>Actions: upload file, API sync, validate"]
+ING --> SRC_BRAND["Branding contracts tile<br/>Fields: train id, wrap id, target hours, delivered hours, remaining hours<br/>Actions: import contracts, edit targets"]
+ING --> SRC_IOT["IoT and mileage tile<br/>Fields: odometer, wear alerts, fault codes, last telemetry timestamp<br/>Actions: refresh, view sensor logs"]
+ING --> SRC_CLEAN["Cleaning roster tile<br/>Fields: crew count, available slots by bay, shift timing<br/>Actions: edit roster, block slot"]
+ING --> SRC_YARD["Yard layout tile<br/>Fields: track list, capacity per track, entry and exit paths<br/>Actions: edit geometry, import layout"]
+ING --> SRC_OVR["Manual overrides tile<br/>Fields: train id, note, effective until date<br/>Actions: add override, revoke override"]
+
+%% validation kick
+ING --> VALID["Run pre validation now button"]
+end
+
+LAND_SUP --> ING
+
+%% =========================
+%% UNIFIED DATA MODEL VIEW
+%% =========================
+subgraph P3["Page 3: Unified Data Model View"]
+direction TB
+UDM["Unified table after ingestion<br/>Columns per train id for one trusted view"]
+UDM_COLS["Columns shown<br/>train id, certificate status with expiry date, critical jobs open, non critical jobs open, mileage km, branding delivered vs target, cleaning due yes or no with last deep clean date, current yard position, overrides present yes or no"]
+end
+VALID --> UDM
+UDM --> MISSING{"Any source missing or stale?"}
+MISSING -->|Yes| PROMPTMISS["Alert banner and modal<br/>Ask supervisor for manual input or re sync"]
+MISSING -->|No| TOSTD["Standardize to unified schema and cache snapshot"]
+
+%% =========================
+%% CONSTRAINT VALIDATION PAGE
+%% =========================
+subgraph P4["Page 4: Constraint Validation"]
+direction TB
+CV["Constraint validator applies hard rules only"]
+CV1["Rule one certificate validity required<br/>If expired mark invalid"]
+CV2["Rule critical job cards must be closed<br/>If open mark invalid"]
+CV3["Rule cleaning due must be scheduled if slot exists<br/>If no slot then mark blocked"]
+CV4["Rule yard capacity and stabling limits enforced"]
+CV5["Rule minimum service trains and minimum standby trains"]
+
+CV_OUTPUT["Output sections<br/>Invalid trains list with reason<br/>Blocked trains list with reason<br/>Eligible trains list"]
+
+OVERRIDE["Supervisor override control<br/>Toggle allow and add reason and expiry date"]
+end
+
+TOSTD --> CV
+CV --> CV_OUTPUT
+CV_OUTPUT --> DECELIG{"Any train eligible for service?"}
+DECELIG -->|No| ACT_ESC["Escalate to duty officer and maintenance chief<br/>Suggest relaxations of soft goals or free cleaning slots"]
+DECELIG -->|Yes| GO_SETUP["Proceed to optimization setup"]
+
+%% =========================
+%% OPTIMIZATION SETUP PAGE
+%% =========================
+subgraph P5["Page 5: Optimization Setup"]
+direction TB
+SETUP["Optimization setup controls<br/>Define weights and options"]
+W_SLIDERS["Weight sliders<br/>branding priority, mileage balancing, shunting minimization, risk mitigation"]
+W_OPTS["Options and checkboxes<br/>strict hard rules always on, allow soft relaxations if infeasible, maximum runtime minutes, solution gap threshold"]
+BTN_RUN["Run optimizer button<br/>Shows progress and logs"]
+end
+
+GO_SETUP --> SETUP
+SETUP --> BTN_RUN
+BTN_RUN --> SOLVE["Optimization engine runs with current weights"]
+
+%% =========================
+%% RESULTS PAGE
+%% =========================
+subgraph P6["Page 6: Optimized Allocation Results"]
+direction TB
+RES["Results and allocations by role"]
+TAB_SERVICE["Service list table<br/>Columns: train id, start time, route id, rationale text"]
+TAB_STANDBY["Standby list table<br/>Columns: train id, priority rank, trigger conditions"]
+TAB_maint["Maintenance list table<br/>Columns: train id, bay, planned jobs"]
+TAB_YARD["Yard stabling plan visual map<br/>Tracks with train ids for morning turn out"]
+EXPORTS["Export section<br/>actions: download PDF, download Excel, send notifications to depot ops"]
+end
+
+SOLVE --> FEAS{"Feasible solution found?"}
+FEAS -->|Yes| RES
+FEAS -->|No| RELAX["Soft constraints auto relax proposal shown<br/>User may accept or adjust sliders"] --> SETUP
+
+%% =========================
+%% SUPERVISOR REVIEW AND WHAT IF
+%% =========================
+subgraph P7["Page 7: Supervisor Review and What if Simulator"]
+direction TB
+XAI["Explainability panel per train<br/>Why selected or excluded with top factors"]
+ALERTS["Conflict alerts panel<br/>Examples: certificate expiring soon, backlog maintenance, branding shortfall"]
+WHATIF["What if controls to re run<br/>Adjust weights by percent, force include or force exclude specific train ids, mark train unavailable"]
+BTN_APPROVE["Approve plan button"]
+BTN_MOD["Modify and re run button"]
+end
+
+RES --> XAI
+XAI --> ALERTS
+ALERTS --> WHATIF
+WHATIF --> BTN_APPROVE
+WHATIF --> BTN_MOD
+BTN_MOD --> SETUP
+
+DECISION{"Supervisor decision approve plan?"}
+BTN_APPROVE --> DECISION
+DECISION -->|Yes| FINALIZE["Finalize plan and lock snapshot<br/>Generate PDF and push notifications"]
+DECISION -->|No need changes| SETUP
+
+%% =========================
+%% EXECUTION TRACKING PAGE
+%% =========================
+subgraph P8["Page 8: Execution Tracking Morning Operations"]
+direction TB
+OPS["Operations monitor view for morning service"]
+OPS_SVC["Service departures table<br/>Columns: train id, planned depart, actual depart, variance, status"]
+OPS_FAIL["Failure and incident log<br/>Fields: train id, time, fault code, action taken"]
+OPS_STBY["Standby deployment view<br/>Which standby replaced which service train and at what time"]
+end
+
+FINALIZE --> OPS
+OPS --> FAILQ{"Any train failure or unscheduled withdrawal"}
+FAILQ -->|Yes| USE_STBY["Trigger standby deployment automatically and notify control room"]
+FAILQ -->|No| SVC_OK["Service running nominal as per plan"]
+
+%% =========================
+%% FEEDBACK AND ANALYTICS PAGE
+%% =========================
+subgraph P9["Page 9: Feedback and Analytics Dashboard"]
+direction TB
+FDB["Planned versus actual analytics and KPI tracking"]
+KPI1["Mileage variance over time line chart"]
+KPI2["Branding compliance percent trend chart"]
+KPI3["Cleaning compliance scheduled versus done chart"]
+KPI4["Shunting time and energy consumption trend"]
+KPI5["Punctuality percent against target"]
+ML_FEED["Data prepared for machine learning updates and solver weight tuning"]
+end
+
+USE_STBY --> FDB
+SVC_OK --> FDB
+OPS_FAIL --> FDB
+
+%% =========================
+%% ADMIN AND CONFIG PAGE
+%% =========================
+subgraph P10["Page 10: Admin and Config"]
+direction TB
+CFG["Admin settings and platform configuration"]
+CFG_BRAND["Manage branding contracts and targets"]
+CFG_YARD["Edit yard layout and track capacities"]
+CFG_SOLVER["Select algorithm family and default weights and solver runtime"]
+CFG_USERS["Manage users and roles and permissions"]
+CFG_AUDIT["Audit logs view of changes and approvals"]
+end
+
+LAND_ADMIN --> CFG
+FDB --> ML_FEED --> CFG_SOLVER
+
+%% =========================
+%% CROSS LINKS SHORTCUTS
+%% =========================
+LAND_MAINT --> CV
+LAND_BRAND --> SETUP
+LAND_OPS --> OPS
+
+%% NAV
+NAV["Global navigation bar present on all pages<br/>Links to Data Hub, Validation, Setup, Results, Review, Ops, Analytics, Admin"]:::navstyle
+
+classDef navstyle fill:#eef,stroke:#88a,stroke-width:1px
