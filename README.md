@@ -2,6 +2,10 @@
 
 A secure, modern web application for KMRL (Kochi Metro Rail Limited) train induction system with role-based access control and multi-factor authentication.
 
+## 🌐 Live Demo
+
+**🚀 Application is live at: [https://gks281263.github.io/KMRL](https://gks281263.github.io/KMRL)**
+
 ## Features
 
 ### 🔐 Secure Authentication
@@ -199,6 +203,28 @@ npm run build
 ```
 
 The build output will be in the `dist/` directory, ready for deployment to any static hosting service.
+
+### GitHub Pages Deployment
+
+The application is automatically deployed to GitHub Pages at:
+**https://gks281263.github.io/KMRL**
+
+#### Manual Deployment
+```bash
+npm run deploy
+```
+
+#### Configuration
+- **Base Path**: `/KMRL/` (configured in `vite.config.ts`)
+- **Homepage**: `https://gks281263.github.io/KMRL` (configured in `package.json`)
+- **404 Redirect**: Handles client-side routing properly
+- **Build Output**: `dist/` directory
+
+### Available Pages
+1. **Login Page** (`/login`) - Secure authentication with MFA
+2. **Data Ingestion Dashboard** (`/data-ingestion`) - Monitor data sources
+3. **Unified Data Model** (`/unified-data-model`) - Train data management
+4. **Validation Dashboard** (`/validation`) - Hard-rule validations
 
 ### Recommended Hosting
 - **Vercel**: Zero-config deployment with automatic HTTPS
