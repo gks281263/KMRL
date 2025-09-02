@@ -2,6 +2,7 @@
   "name": "kmrl-train-induction",
   "version": "1.0.0",
   "description": "KMRL Train Induction Web Application",
+  "homepage": "https://gks281263.github.io/KMRL",
   "type": "module",
   "main": "index.js",
   "scripts": {
@@ -11,21 +12,26 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "predeploy": "npx vite build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@hookform/resolvers": "^2.9.0",
+    "@tanstack/react-query": "^4.29.0",
+    "clsx": "^1.2.0",
+    "lucide-react": "^0.263.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.8.0",
-    "@tanstack/react-query": "^4.29.0",
     "react-hook-form": "^7.43.0",
-    "zod": "^3.20.0",
-    "@hookform/resolvers": "^2.9.0",
-    "lucide-react": "^0.263.0",
-    "clsx": "^1.2.0",
-    "tailwind-merge": "^1.13.0"
+    "react-router-dom": "^6.8.0",
+    "tailwind-merge": "^1.13.0",
+    "zod": "^3.20.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.4.3",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@typescript-eslint/eslint-plugin": "^5.57.0",
@@ -35,17 +41,21 @@
     "eslint": "^8.38.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.3.4",
+    "gh-pages": "^6.3.0",
+    "jsdom": "^21.1.0",
     "postcss": "^8.4.21",
     "tailwindcss": "^3.2.7",
     "typescript": "^4.9.3",
     "vite": "^4.2.0",
-    "vitest": "^0.29.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/user-event": "^14.4.3",
-    "jsdom": "^21.1.0"
+    "vitest": "^0.29.0"
   },
-  "keywords": ["kmrl", "train", "induction", "react", "typescript"],
+  "keywords": [
+    "kmrl",
+    "train",
+    "induction",
+    "react",
+    "typescript"
+  ],
   "author": "KMRL",
   "license": "MIT"
 }

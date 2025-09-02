@@ -1,4 +1,4 @@
-export type ValidationRule = 
+export type ValidationRuleId = 
   | 'certificate_validity'
   | 'critical_jobcards_closed'
   | 'cleaning_schedule'
@@ -9,7 +9,7 @@ export type ValidationRule =
 export type ValidationStatus = 'invalid' | 'blocked' | 'eligible';
 
 export interface ValidationRule {
-  id: ValidationRule;
+  id: ValidationRuleId;
   name: string;
   description: string;
   category: 'certificate' | 'maintenance' | 'cleaning' | 'yard' | 'service';
@@ -20,7 +20,7 @@ export interface ValidationRule {
 export interface TrainValidationResult {
   trainId: string;
   status: ValidationStatus;
-  reasons: ValidationRule[];
+  reasons: ValidationRuleId[];
   evidence: ValidationEvidence;
   lastValidated: string;
   overrides: Override[];
@@ -99,7 +99,7 @@ export interface StablingGeometry {
 export interface Override {
   id: string;
   trainId: string;
-  rule: ValidationRule;
+  rule: ValidationRuleId;
   reason: string;
   expiresAt: string;
   createdBy: string;
@@ -109,7 +109,7 @@ export interface Override {
 
 export interface OverrideRequest {
   trainId: string;
-  rule: ValidationRule;
+  rule: ValidationRuleId;
   reason: string;
   expiresAt: string;
 }
