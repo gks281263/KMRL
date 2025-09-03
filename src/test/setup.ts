@@ -1,12 +1,14 @@
 import '@testing-library/jest-dom';
 
 // Mock IntersectionObserver
-global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
+const MockIntersectionObserver = class {
+  constructor(callback: IntersectionObserverCallback, options?: IntersectionObserverInit) {}
   disconnect() {}
-  observe() {}
-  unobserve() {}
-};
+  observe(target: Element) {}
+  unobserve(target: Element) {}
+} as any;
+
+global.IntersectionObserver = MockIntersectionObserver;
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types/auth';
 import { t } from '@/utils/i18n';
@@ -30,6 +31,7 @@ type OTPFormData = z.infer<typeof otpSchema>;
 
 export const Login = () => {
   const { login, verifyOTP, loginError, otpError, isLoggingIn, isVerifyingOTP } = useAuth();
+  const navigate = useNavigate();
   const [showOTPModal, setShowOTPModal] = useState(false);
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [showRoleSelection, setShowRoleSelection] = useState(false);
@@ -64,6 +66,7 @@ export const Login = () => {
       const timer = setTimeout(() => setOtpCountdown(otpCountdown - 1), 1000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [otpCountdown]);
 
   // Handle login submission
@@ -96,7 +99,7 @@ export const Login = () => {
   // Handle OTP submission
   const onSubmitOTP = async (data: OTPFormData) => {
     try {
-      await verifyOTP(data.otp);
+      await verifyOTP({ otp: data.otp });
       setShowOTPModal(false);
       resetOTP();
       // Show role selection after successful OTP verification
@@ -112,22 +115,22 @@ export const Login = () => {
   const redirectToRoleLanding = (role: UserRole) => {
     switch (role) {
       case 'Supervisor':
-        window.location.href = '/data-ingestion';
+        navigate('/data-ingestion');
         break;
       case 'Maintenance Staff':
-        window.location.href = '/maintenance-tracker';
+        navigate('/maintenance-tracker');
         break;
       case 'Branding Manager':
-        window.location.href = '/branding-dashboard';
+        navigate('/branding-dashboard');
         break;
       case 'Depot Ops':
-        window.location.href = '/execution-tracking';
+        navigate('/execution-tracking');
         break;
       case 'Admin':
-        window.location.href = '/admin-config';
+        navigate('/admin-config');
         break;
       default:
-        window.location.href = '/dashboard';
+        navigate('/');
     }
   };
 

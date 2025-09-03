@@ -220,7 +220,7 @@ export const UnifiedTable = ({
                   <button
                     onClick={() => handleSort('trainId')}
                     className="flex items-center space-x-1 hover:text-neutral-700 focus:outline-none"
-                    aria-sort={currentSort.field === 'trainId' ? currentSort.direction : undefined}
+                    aria-sort={currentSort.field === 'trainId' ? (currentSort.direction === 'asc' ? 'ascending' : 'descending') : undefined}
                   >
                     <span>Train ID</span>
                     <SortIcon field="trainId" currentField={currentSort.field} direction={currentSort.direction} />
@@ -233,7 +233,7 @@ export const UnifiedTable = ({
                   <button
                     onClick={() => handleSort('certificateExpiry')}
                     className="flex items-center space-x-1 hover:text-neutral-700 focus:outline-none"
-                    aria-sort={currentSort.field === 'certificateExpiry' ? currentSort.direction : undefined}
+                    aria-sort={currentSort.field === 'certificateExpiry' ? (currentSort.direction === 'asc' ? 'ascending' : 'descending') : undefined}
                   >
                     <span>Certificate</span>
                     <SortIcon field="certificateExpiry" currentField={currentSort.field} direction={currentSort.direction} />
@@ -246,7 +246,7 @@ export const UnifiedTable = ({
                   <button
                     onClick={() => handleSort('criticalJobs')}
                     className="flex items-center space-x-1 hover:text-neutral-700 focus:outline-none"
-                    aria-sort={currentSort.field === 'criticalJobs' ? currentSort.direction : undefined}
+                    aria-sort={currentSort.field === 'criticalJobs' ? (currentSort.direction === 'asc' ? 'ascending' : 'descending') : undefined}
                   >
                     <span>Critical Jobs</span>
                     <SortIcon field="criticalJobs" currentField={currentSort.field} direction={currentSort.direction} />
@@ -259,7 +259,7 @@ export const UnifiedTable = ({
                   <button
                     onClick={() => handleSort('nonCriticalJobs')}
                     className="flex items-center space-x-1 hover:text-neutral-700 focus:outline-none"
-                    aria-sort={currentSort.field === 'nonCriticalJobs' ? currentSort.direction : undefined}
+                    aria-sort={currentSort.field === 'nonCriticalJobs' ? (currentSort.direction === 'asc' ? 'ascending' : 'descending') : undefined}
                   >
                     <span>Non-Critical Jobs</span>
                     <SortIcon field="nonCriticalJobs" currentField={currentSort.field} direction={currentSort.direction} />
@@ -272,7 +272,7 @@ export const UnifiedTable = ({
                   <button
                     onClick={() => handleSort('mileage')}
                     className="flex items-center space-x-1 hover:text-neutral-700 focus:outline-none"
-                    aria-sort={currentSort.field === 'mileage' ? currentSort.direction : undefined}
+                    aria-sort={currentSort.field === 'mileage' ? (currentSort.direction === 'asc' ? 'ascending' : 'descending') : undefined}
                   >
                     <span>Mileage (km)</span>
                     <SortIcon field="mileage" currentField={currentSort.field} direction={currentSort.direction} />
@@ -285,7 +285,7 @@ export const UnifiedTable = ({
                   <button
                     onClick={() => handleSort('brandingDelivered')}
                     className="flex items-center space-x-1 hover:text-neutral-700 focus:outline-none"
-                    aria-sort={currentSort.field === 'brandingDelivered' ? currentSort.direction : undefined}
+                    aria-sort={currentSort.field === 'brandingDelivered' ? (currentSort.direction === 'asc' ? 'ascending' : 'descending') : undefined}
                   >
                     <span>Branding</span>
                     <SortIcon field="brandingDelivered" currentField={currentSort.field} direction={currentSort.direction} />
@@ -298,7 +298,7 @@ export const UnifiedTable = ({
                   <button
                     onClick={() => handleSort('lastDeepClean')}
                     className="flex items-center space-x-1 hover:text-neutral-700 focus:outline-none"
-                    aria-sort={currentSort.field === 'lastDeepClean' ? currentSort.direction : undefined}
+                    aria-sort={currentSort.field === 'lastDeepClean' ? (currentSort.direction === 'asc' ? 'ascending' : 'descending') : undefined}
                   >
                     <span>Cleaning</span>
                     <SortIcon field="lastDeepClean" currentField={currentSort.field} direction={currentSort.direction} />
@@ -311,7 +311,7 @@ export const UnifiedTable = ({
                   <button
                     onClick={() => handleSort('yardPosition')}
                     className="flex items-center space-x-1 hover:text-neutral-700 focus:outline-none"
-                    aria-sort={currentSort.field === 'yardPosition' ? currentSort.direction : undefined}
+                    aria-sort={currentSort.field === 'yardPosition' ? (currentSort.direction === 'asc' ? 'ascending' : 'descending') : undefined}
                   >
                     <span>Yard Position</span>
                     <SortIcon field="yardPosition" currentField={currentSort.field} direction={currentSort.direction} />

@@ -68,7 +68,8 @@ export const SourceTile = ({ source, onSync, onUpload, isSyncing }: SourceTilePr
 
   return (
     <>
-      <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setShowDetails(true)}>
+      <div onClick={() => setShowDetails(true)}>
+        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
             <span className="text-2xl">{sourceIcon}</span>
@@ -137,8 +138,7 @@ export const SourceTile = ({ source, onSync, onUpload, isSyncing }: SourceTilePr
             <Button
               size="sm"
               variant="primary"
-              onClick={(e) => {
-                e.stopPropagation();
+              onClick={() => {
                 onSync(source.id);
               }}
               loading={isSyncing}
@@ -150,8 +150,7 @@ export const SourceTile = ({ source, onSync, onUpload, isSyncing }: SourceTilePr
               <Button
                 size="sm"
                 variant="secondary"
-                onClick={(e) => {
-                  e.stopPropagation();
+                onClick={() => {
                   onUpload(source.id);
                 }}
                 disabled={isSyncing}
@@ -161,7 +160,8 @@ export const SourceTile = ({ source, onSync, onUpload, isSyncing }: SourceTilePr
             )}
           </div>
         </div>
-      </Card>
+        </Card>
+        </div>
 
       {/* Details Modal */}
       <Modal
