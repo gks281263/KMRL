@@ -8,12 +8,20 @@ import {
   OperationsSnapshot,
   FaultTemplate 
 } from '@/types/operations';
+import { mockOperationsApi } from './mockOperations';
 
 const API_BASE = '/api/ops';
+
+// Use mock data in development mode
+const isDevelopment = import.meta.env.DEV;
 
 export const operationsApi = {
   // Service Departures
   async getServiceDepartures(): Promise<ApiResponse<ServiceDeparture[]>> {
+    if (isDevelopment) {
+      return mockOperationsApi.getServiceDepartures();
+    }
+    
     const response = await fetch(`${API_BASE}/departures/`);
     return response.json();
   },
@@ -23,6 +31,10 @@ export const operationsApi = {
     status: ServiceDeparture['status'], 
     actualDeparture?: string
   ): Promise<ApiResponse<ServiceDeparture>> {
+    if (isDevelopment) {
+      return mockOperationsApi.updateDepartureStatus(departureId, status, actualDeparture);
+    }
+    
     const response = await fetch(`${API_BASE}/departures/${departureId}/status/`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -32,6 +44,10 @@ export const operationsApi = {
   },
 
   async markBoarded(departureId: string): Promise<ApiResponse<ServiceDeparture>> {
+    if (isDevelopment) {
+      return mockOperationsApi.markBoarded(departureId);
+    }
+    
     const response = await fetch(`${API_BASE}/departures/${departureId}/board/`, {
       method: 'POST',
     });
@@ -40,11 +56,19 @@ export const operationsApi = {
 
   // Incidents
   async getIncidents(): Promise<ApiResponse<Incident[]>> {
+    if (isDevelopment) {
+      return mockOperationsApi.getIncidents();
+    }
+    
     const response = await fetch(`${API_BASE}/incidents/`);
     return response.json();
   },
 
   async createIncident(incident: Omit<Incident, 'id' | 'reportedAt' | 'status'>): Promise<ApiResponse<Incident>> {
+    if (isDevelopment) {
+      return mockOperationsApi.createIncident(incident);
+    }
+    
     const response = await fetch(`${API_BASE}/incidents/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -57,6 +81,10 @@ export const operationsApi = {
     incidentId: string, 
     updates: Partial<Incident>
   ): Promise<ApiResponse<Incident>> {
+    if (isDevelopment) {
+      return mockOperationsApi.updateIncident(incidentId, updates);
+    }
+    
     const response = await fetch(`${API_BASE}/incidents/${incidentId}/`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -66,12 +94,20 @@ export const operationsApi = {
   },
 
   async getFaultTemplates(): Promise<ApiResponse<FaultTemplate[]>> {
+    if (isDevelopment) {
+      return mockOperationsApi.getFaultTemplates();
+    }
+    
     const response = await fetch(`${API_BASE}/fault-templates/`);
     return response.json();
   },
 
   // Standby Trains
   async getStandbyTrains(): Promise<ApiResponse<StandbyTrain[]>> {
+    if (isDevelopment) {
+      return mockOperationsApi.getStandbyTrains();
+    }
+    
     const response = await fetch(`${API_BASE}/standby/`);
     return response.json();
   },
@@ -81,6 +117,10 @@ export const operationsApi = {
     replacementForServiceId: string,
     autoDeploy: boolean = false
   ): Promise<ApiResponse<StandbyDeployment>> {
+    if (isDevelopment) {
+      return mockOperationsApi.deployStandby(standbyTrainId, replacementForServiceId, autoDeploy);
+    }
+    
     const response = await fetch(`${API_BASE}/standby/deploy/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -94,17 +134,29 @@ export const operationsApi = {
   },
 
   async getStandbyDeployments(): Promise<ApiResponse<StandbyDeployment[]>> {
+    if (isDevelopment) {
+      return mockOperationsApi.getStandbyDeployments();
+    }
+    
     const response = await fetch(`${API_BASE}/standby/deployments/`);
     return response.json();
   },
 
   // Auto Deploy Policy
   async getAutoDeployPolicy(): Promise<ApiResponse<AutoDeployPolicy>> {
+    if (isDevelopment) {
+      return mockOperationsApi.getAutoDeployPolicy();
+    }
+    
     const response = await fetch(`${API_BASE}/auto-deploy-policy/`);
     return response.json();
   },
 
   async updateAutoDeployPolicy(policy: AutoDeployPolicy): Promise<ApiResponse<AutoDeployPolicy>> {
+    if (isDevelopment) {
+      return mockOperationsApi.updateAutoDeployPolicy(policy);
+    }
+    
     const response = await fetch(`${API_BASE}/auto-deploy-policy/`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -115,12 +167,20 @@ export const operationsApi = {
 
   // System Status
   async getOperationsSnapshot(): Promise<ApiResponse<OperationsSnapshot>> {
+    if (isDevelopment) {
+      return mockOperationsApi.getOperationsSnapshot();
+    }
+    
     const response = await fetch(`${API_BASE}/snapshot/`);
     return response.json();
   },
 
   // Health Check
   async healthCheck(): Promise<ApiResponse<{ status: string; timestamp: string }>> {
+    if (isDevelopment) {
+      return mockOperationsApi.healthCheck();
+    }
+    
     const response = await fetch(`${API_BASE}/health/`);
     return response.json();
   },

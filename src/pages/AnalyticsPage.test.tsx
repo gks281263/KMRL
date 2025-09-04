@@ -68,28 +68,35 @@ describe('AnalyticsPage', () => {
     ],
     mileageData: [
       {
-        week: 'Week 1',
-        planned: 1000,
-        actual: 980,
+        date: '2024-01-01',
+        plannedMileage: 1000,
+        actualMileage: 980,
         variance: -20,
-        variancePercentage: -2.0
+        efficiency: 98.0,
+        trainsInService: 20,
+        averageDelay: 2
       }
     ],
     brandingData: [
       {
-        trainType: 'Metro',
-        compliant: 45,
-        nonCompliant: 5,
-        total: 50,
-        complianceRate: 90.0
+        date: '2024-01-01',
+        totalTrains: 50,
+        brandedTrains: 45,
+        complianceRate: 90.0,
+        pendingRenewals: 2,
+        completedRenewals: 1,
+        overdueRenewals: 0
       }
     ],
     shuntingData: [
       {
-        track: 'A1',
-        hour: 8,
-        shuntingTime: 15,
-        frequency: 5
+        date: '2024-01-01',
+        timeSlot: '08:00',
+        shuntingOperations: 15,
+        energyConsumption: 150,
+        averageDuration: 20,
+        efficiency: 85,
+        trainsMoved: 5
       }
     ],
     isLoading: false,

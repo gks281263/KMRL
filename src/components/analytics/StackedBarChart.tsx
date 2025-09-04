@@ -38,13 +38,14 @@ export const StackedBarChart = ({ data, title, isLoading = false, className }: S
   const barWidth = 40;
   const barSpacing = 20;
 
-  const maxTotal = Math.max(...data.map(d => d.total));
+  const maxTotal = Math.max(...data.map(d => d.totalTrains || 0));
   const availableWidth = chartWidth - 2 * padding;
   const totalBars = data.length;
   const totalBarWidth = totalBars * barWidth + (totalBars - 1) * barSpacing;
   const startX = padding + (availableWidth - totalBarWidth) / 2;
 
   const getY = (value: number) => {
+    if (isNaN(value) || !isFinite(value) || maxTotal === 0) return chartHeight - padding;
     return chartHeight - padding - (value / maxTotal) * (chartHeight - 2 * padding);
   };
 
@@ -85,11 +86,15 @@ export const StackedBarChart = ({ data, title, isLoading = false, className }: S
           {/* Bars */}
           {data.map((item, index) => {
             const x = startX + index * (barWidth + barSpacing);
-            const compliantHeight = (item.compliant / maxTotal) * (chartHeight - 2 * padding);
-            const nonCompliantHeight = (item.nonCompliant / maxTotal) * (chartHeight - 2 * padding);
+            const brandedTrains = item.brandedTrains || 0;
+            const totalTrains = item.totalTrains || 0;
+            const nonBrandedTrains = totalTrains - brandedTrains;
             
-            const compliantY = getY(item.compliant);
-            const nonCompliantY = getY(item.compliant + item.nonCompliant);
+            const compliantHeight = maxTotal > 0 ? (brandedTrains / maxTotal) * (chartHeight - 2 * padding) : 0;
+            const nonCompliantHeight = maxTotal > 0 ? (nonBrandedTrains / maxTotal) * (chartHeight - 2 * padding) : 0;
+            
+            const compliantY = getY(brandedTrains);
+            const nonCompliantY = getY(totalTrains);
 
             return (
               <g key={index}>
@@ -121,7 +126,7 @@ export const StackedBarChart = ({ data, title, isLoading = false, className }: S
                   fontSize="10"
                   fill="#6b7280"
                 >
-                  {item.compliant}
+                  {brandedTrains}
                 </text>
                 <text
                   x={x + barWidth / 2}
@@ -130,7 +135,7 @@ export const StackedBarChart = ({ data, title, isLoading = false, className }: S
                   fontSize="10"
                   fill="#6b7280"
                 >
-                  {item.nonCompliant}
+                  {nonBrandedTrains}
                 </text>
 
                 {/* X-axis label */}
@@ -141,7 +146,7 @@ export const StackedBarChart = ({ data, title, isLoading = false, className }: S
                   fontSize="12"
                   fill="#6b7280"
                 >
-                  {item.trainType}
+                  {new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </text>
 
                 {/* Compliance rate */}
@@ -152,7 +157,7 @@ export const StackedBarChart = ({ data, title, isLoading = false, className }: S
                   fontSize="10"
                   fill="#6b7280"
                 >
-                  {item.complianceRate.toFixed(1)}%
+                  {(item.complianceRate || 0).toFixed(1)}%
                 </text>
               </g>
             );

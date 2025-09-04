@@ -33,17 +33,19 @@ export const LineChart = ({ data, title, isLoading = false, className }: LineCha
   }
 
   // Simple line chart implementation
-  const maxVariance = Math.max(...data.map(d => Math.abs(d.variance)));
+  const maxVariance = Math.max(...data.map(d => Math.abs(d.variance || 0)));
   const chartHeight = 200;
   const chartWidth = 800;
   const padding = 40;
 
-  const getY = (variance: number) => {
-    const normalized = (variance / maxVariance) * (chartHeight - 2 * padding);
+  const getY = (value: number) => {
+    if (isNaN(value) || !isFinite(value)) return chartHeight - padding;
+    const normalized = (value / maxVariance) * (chartHeight - 2 * padding);
     return chartHeight - padding - normalized;
   };
 
   const getX = (index: number) => {
+    if (data.length <= 1) return padding;
     return padding + (index / (data.length - 1)) * (chartWidth - 2 * padding);
   };
 
@@ -55,13 +57,13 @@ export const LineChart = ({ data, title, isLoading = false, className }: LineCha
 
   const plannedPoints = data.map((item, index) => {
     const x = getX(index);
-    const y = getY(item.planned);
+    const y = getY(item.plannedMileage);
     return `${x},${y}`;
   }).join(' ');
 
   const actualPoints = data.map((item, index) => {
     const x = getX(index);
-    const y = getY(item.actual);
+    const y = getY(item.actualMileage);
     return `${x},${y}`;
   }).join(' ');
 
@@ -109,7 +111,7 @@ export const LineChart = ({ data, title, isLoading = false, className }: LineCha
               fontSize="12"
               fill="#6b7280"
             >
-              {item.week}
+              {new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </text>
           ))}
 
@@ -143,13 +145,13 @@ export const LineChart = ({ data, title, isLoading = false, className }: LineCha
             <g key={index}>
               <circle
                 cx={getX(index)}
-                cy={getY(item.planned)}
+                cy={getY(item.plannedMileage)}
                 r="3"
                 fill="#3b82f6"
               />
               <circle
                 cx={getX(index)}
-                cy={getY(item.actual)}
+                cy={getY(item.actualMileage)}
                 r="3"
                 fill="#ef4444"
               />

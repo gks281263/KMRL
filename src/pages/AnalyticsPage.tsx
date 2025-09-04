@@ -210,23 +210,23 @@ export const AnalyticsPage = () => {
       <div className="space-y-8">
         {/* Mileage Variance Chart */}
         <LineChart
-          data={mileageData}
+          data={mileageData || []}
           title={t('analytics.charts.mileageVariance')}
-          isLoading={isChartLoading}
+          isLoading={isChartLoading || isLoading}
         />
 
         {/* Branding Compliance Chart */}
         <StackedBarChart
-          data={brandingData}
+          data={brandingData || []}
           title={t('analytics.charts.brandingCompliance')}
-          isLoading={isChartLoading}
+          isLoading={isChartLoading || isLoading}
         />
 
         {/* Shunting Heatmap */}
         <Heatmap
-          data={shuntingData}
+          data={shuntingData || []}
           title={t('analytics.charts.shuntingHeatmap')}
-          isLoading={isChartLoading}
+          isLoading={isChartLoading || isLoading}
         />
       </div>
 

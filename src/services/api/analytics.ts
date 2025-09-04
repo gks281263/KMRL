@@ -8,8 +8,12 @@ import {
   BrandingComplianceData,
   ShuntingHeatmapData
 } from '@/types/analytics';
+import { mockAnalyticsApi } from './mockAnalytics';
 
 const API_BASE = '/api/analytics';
+
+// Use mock data in development mode
+const isDevelopment = import.meta.env.DEV;
 
 export const analyticsApi = {
   // Analytics Summary
@@ -18,6 +22,10 @@ export const analyticsApi = {
     endDate?: string, 
     compareToPrevious: boolean = false
   ): Promise<ApiResponse<AnalyticsSummary>> {
+    if (isDevelopment) {
+      return mockAnalyticsApi.getAnalyticsSummary(startDate, endDate, compareToPrevious);
+    }
+    
     const params = new URLSearchParams();
     if (startDate) params.append('start_date', startDate);
     if (endDate) params.append('end_date', endDate);
@@ -29,11 +37,19 @@ export const analyticsApi = {
 
   // ML Datasets
   async getMlDatasetsStatus(): Promise<ApiResponse<MlDatasetStatus[]>> {
+    if (isDevelopment) {
+      return mockAnalyticsApi.getMlDatasetsStatus();
+    }
+    
     const response = await fetch(`${API_BASE}/ml/datasets/status/`);
     return response.json();
   },
 
   async exportMlDataset(request: MlExportRequest): Promise<ApiResponse<MlExportResponse>> {
+    if (isDevelopment) {
+      return mockAnalyticsApi.exportMlDataset(request);
+    }
+    
     const response = await fetch(`${API_BASE}/ml/export/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -43,11 +59,32 @@ export const analyticsApi = {
   },
 
   async getMlExportStatus(exportId: string): Promise<ApiResponse<MlExportResponse>> {
+    if (isDevelopment) {
+      // Mock export status - always completed for demo
+      return {
+        success: true,
+        data: {
+          exportId,
+          downloadUrl: `#mock-download-${exportId}`,
+          status: 'completed',
+          recordCount: 50000,
+          fileSize: '25MB',
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+        },
+        message: 'Export status retrieved successfully',
+        timestamp: new Date().toISOString()
+      };
+    }
+    
     const response = await fetch(`${API_BASE}/ml/export/${exportId}/status/`);
     return response.json();
   },
 
   async triggerMlRetrain(datasetIds: string[]): Promise<ApiResponse<{ jobId: string; status: string }>> {
+    if (isDevelopment) {
+      return mockAnalyticsApi.triggerMlRetrain(datasetIds);
+    }
+    
     const response = await fetch(`${API_BASE}/ml/retrain/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -61,6 +98,10 @@ export const analyticsApi = {
     startDate: string, 
     endDate: string
   ): Promise<ApiResponse<MileageVarianceData[]>> {
+    if (isDevelopment) {
+      return mockAnalyticsApi.getMileageVarianceData(startDate, endDate);
+    }
+    
     const params = new URLSearchParams({
       start_date: startDate,
       end_date: endDate,
@@ -74,6 +115,10 @@ export const analyticsApi = {
     startDate: string, 
     endDate: string
   ): Promise<ApiResponse<BrandingComplianceData[]>> {
+    if (isDevelopment) {
+      return mockAnalyticsApi.getBrandingComplianceData(startDate, endDate);
+    }
+    
     const params = new URLSearchParams({
       start_date: startDate,
       end_date: endDate,
@@ -87,6 +132,10 @@ export const analyticsApi = {
     startDate: string, 
     endDate: string
   ): Promise<ApiResponse<ShuntingHeatmapData[]>> {
+    if (isDevelopment) {
+      return mockAnalyticsApi.getShuntingHeatmapData(startDate, endDate);
+    }
+    
     const params = new URLSearchParams({
       start_date: startDate,
       end_date: endDate,
@@ -98,6 +147,10 @@ export const analyticsApi = {
 
   // Health Check
   async healthCheck(): Promise<ApiResponse<{ status: string; timestamp: string }>> {
+    if (isDevelopment) {
+      return mockAnalyticsApi.healthCheck();
+    }
+    
     const response = await fetch(`${API_BASE}/health/`);
     return response.json();
   },

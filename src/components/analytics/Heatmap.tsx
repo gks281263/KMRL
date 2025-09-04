@@ -33,17 +33,21 @@ export const Heatmap = ({ data, title, isLoading = false, className }: HeatmapPr
   }
 
   // Process data for heatmap
-  const tracks = [...new Set(data.map(d => d.track))].sort();
-  const hours = Array.from({ length: 24 }, (_, i) => i);
+  const timeSlots = [...new Set(data.map(d => d.timeSlot))].sort();
+  const dates = [...new Set(data.map(d => d.date))].sort();
   
-  const maxShuntingTime = Math.max(...data.map(d => d.shuntingTime));
-  const maxFrequency = Math.max(...data.map(d => d.frequency));
+  const maxShuntingTime = Math.max(...data.map(d => d.shuntingOperations || 0));
+  const maxFrequency = Math.max(...data.map(d => d.trainsMoved || 0));
 
-  const getCellData = (track: string, hour: number) => {
-    return data.find(d => d.track === track && d.hour === hour) || null;
+  const getCellData = (date: string, timeSlot: string) => {
+    return data.find(d => d.date === date && d.timeSlot === timeSlot) || null;
   };
 
   const getColor = (shuntingTime: number, frequency: number) => {
+    if (isNaN(shuntingTime) || isNaN(frequency) || maxShuntingTime === 0 || maxFrequency === 0) {
+      return '#f3f4f6'; // gray-100
+    }
+    
     const timeIntensity = shuntingTime / maxShuntingTime;
     const freqIntensity = frequency / maxFrequency;
     const intensity = (timeIntensity + freqIntensity) / 2;
@@ -57,8 +61,8 @@ export const Heatmap = ({ data, title, isLoading = false, className }: HeatmapPr
 
   const cellSize = 30;
   const padding = 60;
-  const chartWidth = tracks.length * cellSize + padding;
-  const chartHeight = hours.length * cellSize + padding;
+  const chartWidth = dates.length * cellSize + padding;
+  const chartHeight = timeSlots.length * cellSize + padding;
 
   return (
     <Card className={cn('p-6', className)}>
@@ -71,10 +75,10 @@ export const Heatmap = ({ data, title, isLoading = false, className }: HeatmapPr
           className="w-full"
           viewBox={`0 0 ${chartWidth} ${chartHeight}`}
         >
-          {/* Y-axis labels (hours) */}
-          {hours.map((hour, index) => (
+          {/* Y-axis labels (time slots) */}
+          {timeSlots.map((timeSlot, index) => (
             <text
-              key={hour}
+              key={timeSlot}
               x={padding - 10}
               y={padding + index * cellSize + cellSize / 2}
               textAnchor="end"
@@ -82,14 +86,14 @@ export const Heatmap = ({ data, title, isLoading = false, className }: HeatmapPr
               fill="#6b7280"
               dominantBaseline="middle"
             >
-              {hour.toString().padStart(2, '0')}:00
+              {timeSlot}
             </text>
           ))}
 
-          {/* X-axis labels (tracks) */}
-          {tracks.map((track, index) => (
+          {/* X-axis labels (dates) */}
+          {dates.map((date, index) => (
             <text
-              key={track}
+              key={date}
               x={padding + index * cellSize + cellSize / 2}
               y={padding - 10}
               textAnchor="middle"
@@ -97,25 +101,25 @@ export const Heatmap = ({ data, title, isLoading = false, className }: HeatmapPr
               fill="#6b7280"
               dominantBaseline="middle"
             >
-              {track}
+              {new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </text>
           ))}
 
           {/* Heatmap cells */}
-          {tracks.map((track, trackIndex) => 
-            hours.map((hour, hourIndex) => {
-              const cellData = getCellData(track, hour);
-              const x = padding + trackIndex * cellSize;
-              const y = padding + hourIndex * cellSize;
+          {dates.map((date, dateIndex) => 
+            timeSlots.map((timeSlot, timeIndex) => {
+              const cellData = getCellData(date, timeSlot);
+              const x = padding + dateIndex * cellSize;
+              const y = padding + timeIndex * cellSize;
               
               return (
-                <g key={`${track}-${hour}`}>
+                <g key={`${date}-${timeSlot}`}>
                   <rect
                     x={x}
                     y={y}
                     width={cellSize}
                     height={cellSize}
-                    fill={cellData ? getColor(cellData.shuntingTime, cellData.frequency) : '#f9fafb'}
+                    fill={cellData ? getColor(cellData.shuntingOperations, cellData.trainsMoved) : '#f9fafb'}
                     stroke="#e5e7eb"
                     strokeWidth="1"
                   />
@@ -125,10 +129,10 @@ export const Heatmap = ({ data, title, isLoading = false, className }: HeatmapPr
                       y={y + cellSize / 2}
                       textAnchor="middle"
                       fontSize="10"
-                      fill={cellData.shuntingTime > maxShuntingTime * 0.5 ? 'white' : '#374151'}
+                      fill={cellData.shuntingOperations > maxShuntingTime * 0.5 ? 'white' : '#374151'}
                       dominantBaseline="middle"
                     >
-                      {cellData.shuntingTime}
+                      {cellData.shuntingOperations || 0}
                     </text>
                   )}
                 </g>

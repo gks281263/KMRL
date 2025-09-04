@@ -7,6 +7,8 @@ export interface KpiData {
   trend: 'up' | 'down' | 'stable';
   sparkline: number[]; // Last 7 days of data points
   lastUpdated: string;
+  target?: number;
+  status?: 'good' | 'warning' | 'critical';
 }
 
 export interface ChartData {
@@ -25,14 +27,11 @@ export interface MlDatasetStatus {
   missingFields?: string[];
   stalenessDays?: number;
   recordCount: number;
-  fieldCount: number;
   completeness: number; // Percentage of complete records
 }
 
 export interface AnalyticsSummary {
   kpis: KpiData[];
-  charts: ChartData[];
-  mlDatasets: MlDatasetStatus[];
   dateRange: {
     start: string;
     end: string;
@@ -42,26 +41,33 @@ export interface AnalyticsSummary {
 }
 
 export interface MileageVarianceData {
-  week: string;
-  planned: number;
-  actual: number;
+  date: string;
+  plannedMileage: number;
+  actualMileage: number;
   variance: number;
-  variancePercentage: number;
+  efficiency: number;
+  trainsInService: number;
+  averageDelay: number;
 }
 
 export interface BrandingComplianceData {
-  trainType: string;
-  compliant: number;
-  nonCompliant: number;
-  total: number;
+  date: string;
+  totalTrains: number;
+  brandedTrains: number;
   complianceRate: number;
+  pendingRenewals: number;
+  completedRenewals: number;
+  overdueRenewals: number;
 }
 
 export interface ShuntingHeatmapData {
-  track: string;
-  hour: number;
-  shuntingTime: number; // Minutes
-  frequency: number;
+  date: string;
+  timeSlot: string;
+  shuntingOperations: number;
+  energyConsumption: number;
+  averageDuration: number;
+  efficiency: number;
+  trainsMoved: number;
 }
 
 export interface MlExportRequest {
@@ -75,11 +81,11 @@ export interface MlExportRequest {
 }
 
 export interface MlExportResponse {
-  id: string;
+  exportId: string;
   status: 'processing' | 'completed' | 'failed';
   downloadUrl?: string;
   error?: string;
   recordCount?: number;
-  fileSize?: number;
+  fileSize?: string;
   expiresAt: string;
 }

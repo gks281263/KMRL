@@ -20,12 +20,27 @@ export class OperationsSocket {
   private heartbeatInterval: NodeJS.Timeout | null = null;
   private url: string;
 
-  constructor(url: string = '/api/ops/stream/') {
-    this.url = url;
+  constructor(url?: string) {
+    // Use environment-aware URL construction
+    if (url) {
+      this.url = url;
+    } else {
+      // In development, use the Vite dev server WebSocket proxy
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const host = window.location.host;
+      this.url = `${protocol}//${host}/api/ops/stream/`;
+    }
   }
 
   connect(callbacks: OperationsSocketCallbacks): void {
     this.callbacks = callbacks;
+    
+    // In development mode, check if we should attempt WebSocket connection
+    if (import.meta.env.DEV) {
+      console.log('Development mode: WebSocket connection may fail if backend server is not running');
+      console.log('Attempting to connect to:', this.url);
+    }
+    
     this.connectWebSocket();
   }
 
@@ -37,10 +52,19 @@ export class OperationsSocket {
     this.isConnecting = true;
     
     try {
+      // Add connection timeout
+      const connectionTimeout = setTimeout(() => {
+        if (this.ws && this.ws.readyState === WebSocket.CONNECTING) {
+          console.warn('WebSocket connection timeout, closing connection');
+          this.ws.close();
+        }
+      }, 10000); // 10 second timeout
+
       this.ws = new WebSocket(this.url);
       
       this.ws.onopen = () => {
         console.log('Operations WebSocket connected');
+        clearTimeout(connectionTimeout);
         this.isConnecting = false;
         this.reconnectAttempts = 0;
         this.reconnectDelay = 1000;
@@ -58,17 +82,23 @@ export class OperationsSocket {
       };
 
       this.ws.onclose = (event) => {
+        clearTimeout(connectionTimeout);
         console.log('Operations WebSocket disconnected:', event.code, event.reason);
         this.isConnecting = false;
         this.callbacks.onConnectionChange?.(false);
         this.stopHeartbeat();
         
+        // Only attempt reconnection if it wasn't a clean close and we haven't exceeded max attempts
         if (!event.wasClean && this.reconnectAttempts < this.maxReconnectAttempts) {
           this.scheduleReconnect();
+        } else if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+          console.warn('Max WebSocket reconnection attempts reached. Please check server status.');
+          this.callbacks.onError?.('WebSocket connection failed after maximum retry attempts');
         }
       };
 
       this.ws.onerror = (error) => {
+        clearTimeout(connectionTimeout);
         console.error('Operations WebSocket error:', error);
         this.isConnecting = false;
         this.callbacks.onError?.('WebSocket connection error');
@@ -148,6 +178,20 @@ export class OperationsSocket {
 
   isConnected(): boolean {
     return this.ws?.readyState === WebSocket.OPEN;
+  }
+
+  // Method to check if WebSocket server is available (for development)
+  async checkServerAvailability(): Promise<boolean> {
+    try {
+      const response = await fetch('/api/ops/health', { 
+        method: 'HEAD',
+        signal: AbortSignal.timeout(5000) // 5 second timeout
+      });
+      return response.ok;
+    } catch (error) {
+      console.warn('WebSocket server health check failed:', error);
+      return false;
+    }
   }
 }
 
