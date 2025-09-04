@@ -12,8 +12,8 @@ import { mockOperationsApi } from './mockOperations';
 
 const API_BASE = '/api/ops';
 
-// Use mock data in development mode
-const isDevelopment = import.meta.env.DEV;
+// Use mock data in development mode or when deployed to GitHub Pages
+const isDevelopment = import.meta.env.DEV || window.location.hostname.includes('github.io');
 
 export const operationsApi = {
   // Service Departures

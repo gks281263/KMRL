@@ -35,6 +35,13 @@ export class OperationsSocket {
   connect(callbacks: OperationsSocketCallbacks): void {
     this.callbacks = callbacks;
     
+    // Skip WebSocket connection on GitHub Pages since there's no backend server
+    if (window.location.hostname.includes('github.io')) {
+      console.log('GitHub Pages deployment: Skipping WebSocket connection (no backend server available)');
+      this.callbacks.onConnectionChange?.(false);
+      return;
+    }
+    
     // In development mode, check if we should attempt WebSocket connection
     if (import.meta.env.DEV) {
       console.log('Development mode: WebSocket connection may fail if backend server is not running');

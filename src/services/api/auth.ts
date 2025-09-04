@@ -185,4 +185,4 @@ export const mockAuthApi = {
 };
 
 // Use mock API in development
-export const api = import.meta.env.DEV ? mockAuthApi : authApi;
+export const api = (import.meta.env.DEV || window.location.hostname.includes('github.io')) ? mockAuthApi : authApi;
