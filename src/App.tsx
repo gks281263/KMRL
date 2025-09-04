@@ -10,36 +10,89 @@ import { OpsMonitorPage } from './pages/OpsMonitorPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
 import NavigationDemo from './pages/NavigationDemo';
 import { Layout } from './components/Layout';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
   return (
     <div className="App">
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Navigate to="/login" replace />} />
         
         {/* Protected routes with Layout */}
-        <Route path="/data-ingestion" element={<Layout><DataIngestionPage /></Layout>} />
-        <Route path="/unified-data-model" element={<Layout><UnifiedDataModelPage /></Layout>} />
-        <Route path="/validation" element={<Layout><ValidationPage /></Layout>} />
-        <Route path="/optimization" element={<Layout><OptimizationPage /></Layout>} />
-        <Route path="/results" element={<Layout><ResultsPage /></Layout>} />
-        <Route path="/review" element={<Layout><ReviewPage /></Layout>} />
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Layout><DataIngestionPage /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/data-ingestion" element={
+          <ProtectedRoute>
+            <Layout><DataIngestionPage /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/unified-data-model" element={
+          <ProtectedRoute>
+            <Layout><UnifiedDataModelPage /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/validation" element={
+          <ProtectedRoute>
+            <Layout><ValidationPage /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/optimization" element={
+          <ProtectedRoute>
+            <Layout><OptimizationPage /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/results" element={
+          <ProtectedRoute>
+            <Layout><ResultsPage /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/review" element={
+          <ProtectedRoute>
+            <Layout><ReviewPage /></Layout>
+          </ProtectedRoute>
+        } />
         
         {/* New pages we've created */}
-        <Route path="/ops-monitor" element={<Layout><OpsMonitorPage /></Layout>} />
-        <Route path="/analytics" element={<Layout><AnalyticsPage /></Layout>} />
+        <Route path="/ops-monitor" element={
+          <ProtectedRoute>
+            <Layout><OpsMonitorPage /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/analytics" element={
+          <ProtectedRoute>
+            <Layout><AnalyticsPage /></Layout>
+          </ProtectedRoute>
+        } />
         
         {/* Placeholder pages for other roles */}
-        <Route path="/maintenance-tracker" element={<Layout><div className="p-8"><h1>Maintenance Tracker</h1><p>Maintenance Staff landing page - Coming soon</p></div></Layout>} />
-        <Route path="/branding-dashboard" element={<Layout><div className="p-8"><h1>Branding Dashboard</h1><p>Branding Manager landing page - Coming soon</p></div></Layout>} />
-        <Route path="/execution-tracking" element={<Layout><div className="p-8"><h1>Execution Tracking</h1><p>Depot Ops landing page - Coming soon</p></div></Layout>} />
-        <Route path="/admin-config" element={<Layout><div className="p-8"><h1>Admin and Config</h1><p>Admin landing page - Coming soon</p></div></Layout>} />
+        <Route path="/maintenance-tracker" element={
+          <ProtectedRoute>
+            <Layout><div className="p-8"><h1>Maintenance Tracker</h1><p>Maintenance Staff landing page - Coming soon</p></div></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/branding-dashboard" element={
+          <ProtectedRoute>
+            <Layout><div className="p-8"><h1>Branding Dashboard</h1><p>Branding Manager landing page - Coming soon</p></div></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/execution-tracking" element={
+          <ProtectedRoute>
+            <Layout><div className="p-8"><h1>Execution Tracking</h1><p>Depot Ops landing page - Coming soon</p></div></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin-config" element={
+          <ProtectedRoute>
+            <Layout><div className="p-8"><h1>Admin and Config</h1><p>Admin landing page - Coming soon</p></div></Layout>
+          </ProtectedRoute>
+        } />
         
         {/* Navigation System Demo */}
         <Route path="/navigation-demo" element={<NavigationDemo />} />
         
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
   );

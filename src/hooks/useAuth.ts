@@ -21,51 +21,26 @@ export function useAuth() {
     setLoginError(null);
     
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 500));
     
-    // Mock validation logic
-    if (credentials.username === 'admin' && credentials.password === 'password123') {
-      const mockResponse: LoginResponse = {
-        token: 'mock-jwt-token',
-        roles: ['Supervisor', 'Admin'],
-        mfaRequired: true,
-      };
-      
-      if (mockResponse.mfaRequired) {
-        setMfaRequired(true);
-      } else if (mockResponse.roles.length === 1) {
-        setSelectedRole(mockResponse.roles[0]);
-      }
-      
-      setIsLoggingIn(false);
-      return mockResponse;
-    } else if (credentials.username === 'supervisor' && credentials.password === 'password123') {
-      const mockResponse: LoginResponse = {
-        token: 'mock-jwt-token-supervisor',
-        roles: ['Supervisor'],
-        mfaRequired: false,
-      };
-      
-      setSelectedRole('Supervisor');
-      setIsAuthenticated(true);
-      setUser({
-        userId: 'user-123',
-        name: 'John Doe',
-        roles: ['Supervisor'],
-        defaultRole: 'Supervisor',
-      });
-      
-      setIsLoggingIn(false);
-      return mockResponse;
-    } else {
-      const error: AuthError = {
-        code: 'INVALID_CREDENTIALS',
-        message: 'Invalid username or password',
-      };
-      setLoginError(error);
-      setIsLoggingIn(false);
-      throw error;
-    }
+    // Simplified demo login - accept any credentials for demo purposes
+    const mockResponse: LoginResponse = {
+      token: 'mock-jwt-token',
+      roles: ['Supervisor'],
+      mfaRequired: false,
+    };
+    
+    setSelectedRole('Supervisor');
+    setIsAuthenticated(true);
+    setUser({
+      userId: 'user-123',
+      name: 'Demo User',
+      roles: ['Supervisor'],
+      defaultRole: 'Supervisor',
+    });
+    
+    setIsLoggingIn(false);
+    return mockResponse;
   }, []);
 
   const verifyOTP = useCallback(async (request: OTPVerificationRequest) => {
@@ -75,27 +50,18 @@ export function useAuth() {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    if (request.otp === '123456') {
-      setMfaRequired(false);
-      setIsAuthenticated(true);
-      setUser({
-        userId: 'user-123',
-        name: 'John Doe',
-        roles: ['Supervisor', 'Admin'],
-        defaultRole: 'Supervisor',
-      });
-      
-      setIsVerifyingOTP(false);
-      return { token: 'mock-jwt-token-verified' };
-    } else {
-      const error: AuthError = {
-        code: 'OTP_INVALID',
-        message: 'Invalid OTP code',
-      };
-      setOtpError(error);
-      setIsVerifyingOTP(false);
-      throw error;
-    }
+    // Simplified demo OTP - accept any 6-digit code
+    setMfaRequired(false);
+    setIsAuthenticated(true);
+    setUser({
+      userId: 'user-123',
+      name: 'Demo User',
+      roles: ['Supervisor'],
+      defaultRole: 'Supervisor',
+    });
+    
+    setIsVerifyingOTP(false);
+    return { token: 'mock-jwt-token-verified' };
   }, []);
 
   const logout = useCallback(async () => {
